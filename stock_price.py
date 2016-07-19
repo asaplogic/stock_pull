@@ -1,7 +1,6 @@
-import urllib.request
-import urllib.parse
-import string
+import requests
 
+#using request library
 
 #name of stock to pull
 stock_to_pull= "AAPL"
@@ -12,15 +11,22 @@ def pull_data(stock):
     save_file = open(file_line, 'w')
     
     urlToVisit = 'http://chartapi.finance.yahoo.com/instrument/1.0/'+stock+'/chartdata;type=quote;range=1m/csv'
-    sourceCode = urllib.request.urlopen(urlToVisit)
-    split_source = sourceCode.split('\n')
-    split_source = split_source[18:] # cut off the header
+    split_code = requests.get(urlToVisit).text #stores the text into variable
+    split_code = split_code.splitlines()[18:] #cuts off first 18 lines and returns the rest
 
-    for i, each_line in enumerate(split_source):
+
+    #checks to see if working        
+    print("Pulling:"+stock_to_pull+ "\n"+urlToVisit)
+
+    for i, each_line in enumerate(split_code):
         if each_line:
-            date,close_price,high,low,open_price,volume = each_line.split(',')
-            line_to_write = str(i)+ ','+ high +'\n'
-            save_file.write(line_to_write)
-            #print line_to_write, len(line_to_write)
- 
-pull_data(stock_to_pull)
+            date, close_price,high,low,open_price,volume = each_line.split(',')
+            line_to_write = str(i) + ','+high + '\n'
+
+            #save_file.write(line_to_write)
+    
+    print(split_code)
+
+
+        
+pull_data(stock_to_pull) 
